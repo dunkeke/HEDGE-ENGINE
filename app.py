@@ -128,6 +128,10 @@ def month_sort_key(m):
     except Exception:
         return 999999
 
+def normalize_month_key(month_series):
+    """统一Month键的类型，避免merge时因dtype不一致报错"""
+    return month_series.apply(standardize_month_str).astype('string')
+
 def weighted_price(values, weights):
     """计算加权价格"""
     values = np.array(values, dtype=float)
@@ -153,6 +157,8 @@ def build_paper_positions(source_df):
             df['Month'] = None
     else:
         df['Month'] = df[month_cols[0]].apply(standardize_month_str)
+
+    df['Month'] = normalize_month_key(df['Month'])
 
     # 数量列
     qty_cols = [c for c in df.columns if c.lower() in ['qty','quantity','volume','hedge_qty','paper_qty','position','lot']]
@@ -229,6 +235,8 @@ def build_physical_net(source_df):
             df['Month'] = None
     else:
         df['Month'] = df[month_cols[0]].apply(standardize_month_str)
+
+    df['Month'] = normalize_month_key(df['Month'])
 
     qty_cols = [c for c in df.columns if c.lower() in ['qty','quantity','volume','net_qty','net','amount','mt','bbls']]
     qty_col = qty_cols[0] if qty_cols else None
@@ -491,6 +499,9 @@ def show_paper_matching_page(uploaded_files):
             
             # 合并匹配
             if st.session_state.paper_df is not None and st.session_state.physical_df is not None:
+                st.session_state.paper_df['Month'] = normalize_month_key(st.session_state.paper_df['Month'])
+                st.session_state.physical_df['Month'] = normalize_month_key(st.session_state.physical_df['Month'])
+
                 merged = pd.merge(
                     st.session_state.physical_df,
                     st.session_state.paper_df,

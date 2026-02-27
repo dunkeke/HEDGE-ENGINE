@@ -21,30 +21,76 @@ st.set_page_config(
 # 自定义CSS样式
 st.markdown("""
 <style>
+    .stApp {
+        background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 52%, #eef4ff 100%);
+        color: #0f172a;
+    }
     .main-header {
-        font-size: 2.5rem;
-        color: #1E88E5;
+        font-size: 2.4rem;
+        color: #0D47A1;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
+        letter-spacing: 0.4px;
+        font-weight: 700;
     }
     .sub-header {
-        font-size: 1.5rem;
-        color: #0D47A1;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+        color: #0B5394;
+        margin-top: 0.8rem;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+    }
+    .hero-panel {
+        background: linear-gradient(120deg, #0b3d91 0%, #1565c0 55%, #1e88e5 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 1.1rem 1.2rem;
+        margin: 0.4rem 0 1rem 0;
+        box-shadow: 0 8px 22px rgba(13,71,161,.18);
+    }
+    .hero-panel p {
+        margin: 0.25rem 0 0 0;
+        opacity: .92;
     }
     .metric-card {
-        background-color: #f0f2f6;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+        border: 1px solid #d7e3f7;
+        min-height: 140px;
+    }
+    .metric-card h3 {
+        margin-bottom: 0.45rem;
+        color: #0b3d91;
+        font-weight: 700;
+    }
+    .metric-card p {
+        margin: 0;
+        color: #1f2937;
+        line-height: 1.45;
     }
     .info-text {
-        color: #555;
-        font-size: 0.9rem;
+        color: #1f2937;
+        font-size: 0.95rem;
     }
     .stAlert {
-        border-radius: 5px;
+        border-radius: 10px;
+    }
+    .stMarkdown, .stText, .stCaption, label, p {
+        color: #0f172a;
+    }
+    [data-testid="stSidebar"] {
+        background: #eaf2ff;
+    }
+    [data-testid="stSidebar"] * {
+        color: #0f172a !important;
+    }
+    [data-testid="stSidebar"] .stRadio > div {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 6px;
+        border: 1px solid #dde8fb;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -128,6 +174,10 @@ def month_sort_key(m):
     except Exception:
         return 999999
 
+def normalize_month_key(month_series):
+    """统一Month键的类型，避免merge时因dtype不一致报错"""
+    return month_series.apply(standardize_month_str).astype('string')
+
 def weighted_price(values, weights):
     """计算加权价格"""
     values = np.array(values, dtype=float)
@@ -153,6 +203,8 @@ def build_paper_positions(source_df):
             df['Month'] = None
     else:
         df['Month'] = df[month_cols[0]].apply(standardize_month_str)
+
+    df['Month'] = normalize_month_key(df['Month'])
 
     # 数量列
     qty_cols = [c for c in df.columns if c.lower() in ['qty','quantity','volume','hedge_qty','paper_qty','position','lot']]
@@ -229,6 +281,8 @@ def build_physical_net(source_df):
             df['Month'] = None
     else:
         df['Month'] = df[month_cols[0]].apply(standardize_month_str)
+
+    df['Month'] = normalize_month_key(df['Month'])
 
     qty_cols = [c for c in df.columns if c.lower() in ['qty','quantity','volume','net_qty','net','amount','mt','bbls']]
     qty_col = qty_cols[0] if qty_cols else None
@@ -335,6 +389,12 @@ def create_ticket_pivot(ticket_df):
 # 主应用
 def main():
     st.markdown('<h1 class="main-header">📊 纸货匹配与Ticket透视系统</h1>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="hero-panel">
+        <strong>一站式风险与头寸看板</strong>
+        <p>上传原始文件后即可进行纸货匹配、Ticket透视与趋势分析，帮助更快定位敞口与匹配效率。</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # 侧边栏
     with st.sidebar:
@@ -356,7 +416,7 @@ def main():
         if uploaded_files:
             st.success(f"已上传 {len(uploaded_files)} 个文件")
             for f in uploaded_files:
-                st.text(f"✓ {f.name}")
+                st.caption(f"✅ {f.name}")
         
         st.markdown("---")
         st.markdown("### 关于")
@@ -376,6 +436,7 @@ def main():
 
 def show_home_page():
     """首页"""
+    st.markdown('<p class="info-text">欢迎使用分析平台：建议先在左侧上传纸面/物理或Ticket文件，再进入对应模块处理。</p>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -456,12 +517,12 @@ def show_paper_matching_page(uploaded_files):
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("📄 纸面数据文件")
+        st.markdown("### 📄 纸面数据文件")
         for f in paper_files:
             st.write(f"✓ {f.name}")
     
     with col2:
-        st.subheader("📦 物理数据文件")
+        st.markdown("### 📦 物理数据文件")
         for f in physical_files:
             st.write(f"✓ {f.name}")
     
@@ -491,6 +552,9 @@ def show_paper_matching_page(uploaded_files):
             
             # 合并匹配
             if st.session_state.paper_df is not None and st.session_state.physical_df is not None:
+                st.session_state.paper_df['Month'] = normalize_month_key(st.session_state.paper_df['Month'])
+                st.session_state.physical_df['Month'] = normalize_month_key(st.session_state.physical_df['Month'])
+
                 merged = pd.merge(
                     st.session_state.physical_df,
                     st.session_state.paper_df,

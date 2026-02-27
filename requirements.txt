@@ -2,3 +2,4 @@ pandas
 numpy
 openpyxl
 streamlit
+altair<5

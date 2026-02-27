@@ -21,30 +21,63 @@ st.set_page_config(
 # 自定义CSS样式
 st.markdown("""
 <style>
+    .stApp {
+        background: radial-gradient(circle at top left, #eef5ff 0%, #f7f9fc 45%, #ffffff 100%);
+    }
     .main-header {
-        font-size: 2.5rem;
-        color: #1E88E5;
+        font-size: 2.4rem;
+        color: #0D47A1;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
+        letter-spacing: 0.4px;
+        font-weight: 700;
     }
     .sub-header {
-        font-size: 1.5rem;
-        color: #0D47A1;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+        color: #0B5394;
+        margin-top: 0.8rem;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+    }
+    .hero-panel {
+        background: linear-gradient(120deg, #0d47a1 0%, #1e88e5 55%, #64b5f6 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 1.1rem 1.2rem;
+        margin: 0.4rem 0 1rem 0;
+        box-shadow: 0 8px 22px rgba(13,71,161,.18);
+    }
+    .hero-panel p {
+        margin: 0.25rem 0 0 0;
+        opacity: .92;
     }
     .metric-card {
-        background-color: #f0f2f6;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e8edf5;
+        min-height: 140px;
+    }
+    .metric-card h3 {
+        margin-bottom: 0.45rem;
+        color: #0d47a1;
     }
     .info-text {
-        color: #555;
-        font-size: 0.9rem;
+        color: #4a5568;
+        font-size: 0.92rem;
     }
     .stAlert {
-        border-radius: 5px;
+        border-radius: 10px;
+    }
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
+    }
+    [data-testid="stSidebar"] .stRadio > div {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 6px;
+        border: 1px solid #dde8fb;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -343,6 +376,12 @@ def create_ticket_pivot(ticket_df):
 # 主应用
 def main():
     st.markdown('<h1 class="main-header">📊 纸货匹配与Ticket透视系统</h1>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="hero-panel">
+        <strong>一站式风险与头寸看板</strong>
+        <p>上传原始文件后即可进行纸货匹配、Ticket透视与趋势分析，帮助更快定位敞口与匹配效率。</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # 侧边栏
     with st.sidebar:
@@ -364,7 +403,7 @@ def main():
         if uploaded_files:
             st.success(f"已上传 {len(uploaded_files)} 个文件")
             for f in uploaded_files:
-                st.text(f"✓ {f.name}")
+                st.caption(f"✅ {f.name}")
         
         st.markdown("---")
         st.markdown("### 关于")
@@ -384,6 +423,7 @@ def main():
 
 def show_home_page():
     """首页"""
+    st.markdown('<p class="info-text">欢迎使用分析平台：建议先在左侧上传纸面/物理或Ticket文件，再进入对应模块处理。</p>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -464,12 +504,12 @@ def show_paper_matching_page(uploaded_files):
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("📄 纸面数据文件")
+        st.markdown("### 📄 纸面数据文件")
         for f in paper_files:
             st.write(f"✓ {f.name}")
     
     with col2:
-        st.subheader("📦 物理数据文件")
+        st.markdown("### 📦 物理数据文件")
         for f in physical_files:
             st.write(f"✓ {f.name}")
     

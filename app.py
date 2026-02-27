@@ -22,7 +22,8 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background: radial-gradient(circle at top left, #eef5ff 0%, #f7f9fc 45%, #ffffff 100%);
+        background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 52%, #eef4ff 100%);
+        color: #0f172a;
     }
     .main-header {
         font-size: 2.4rem;
@@ -40,7 +41,7 @@ st.markdown("""
         font-weight: 600;
     }
     .hero-panel {
-        background: linear-gradient(120deg, #0d47a1 0%, #1e88e5 55%, #64b5f6 100%);
+        background: linear-gradient(120deg, #0b3d91 0%, #1565c0 55%, #1e88e5 100%);
         color: #ffffff;
         border-radius: 14px;
         padding: 1.1rem 1.2rem;
@@ -56,22 +57,34 @@ st.markdown("""
         border-radius: 12px;
         padding: 16px;
         box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-        border: 1px solid #e8edf5;
+        border: 1px solid #d7e3f7;
         min-height: 140px;
     }
     .metric-card h3 {
         margin-bottom: 0.45rem;
-        color: #0d47a1;
+        color: #0b3d91;
+        font-weight: 700;
+    }
+    .metric-card p {
+        margin: 0;
+        color: #1f2937;
+        line-height: 1.45;
     }
     .info-text {
-        color: #4a5568;
-        font-size: 0.92rem;
+        color: #1f2937;
+        font-size: 0.95rem;
     }
     .stAlert {
         border-radius: 10px;
     }
+    .stMarkdown, .stText, .stCaption, label, p {
+        color: #0f172a;
+    }
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
+        background: #eaf2ff;
+    }
+    [data-testid="stSidebar"] * {
+        color: #0f172a !important;
     }
     [data-testid="stSidebar"] .stRadio > div {
         background: #ffffff;
